@@ -55,16 +55,25 @@
       background-color: #0056b3;
     }
   </style>
+  
+  
+
+
+
 </head>
 <body>
   <div class="container">
     <h2>College Event Registration Form</h2>
-    <form action="/submit_registration" method="post">
+    <form method="post" id="form1">
       <!-- Team Leader -->
       <div class="member">
         <h3>Team Leader Details</h3>
         <label for="leader_name">Name:<span style="color: red;">*</span></label>
         <input type="text" id="leader_name" name="leader_name" required>
+		
+	<label for="email">Email:<span style="color: red;">*</span></label>
+	  <input type="email" name="email" placeholder="Your Email" required>
+
 
         <label for="leader_roll">University Roll Number:<span style="color: red;">*</span></label>
         <input type="text" id="leader_roll" name="leader_roll" required>
@@ -166,4 +175,23 @@
     </form>
   </div>
 </body>
+
+<script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+<script>
+  (function(){
+    emailjs.init("b5Tp_c1K2Z9odzFNh");
+  })();
+</script>
+<script>
+  document.getElementById('form1').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    emailjs.sendForm('service_3is0mf6', 'template_6m20d5e', this)
+      .then(function(response) {
+        alert("Email sent successfully!");
+      }, function(error) {
+        alert("Failed to send email: " + JSON.stringify(error));
+      });
+  });
+</script>
 </html>
