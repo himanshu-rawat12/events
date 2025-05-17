@@ -1,0 +1,1831 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EventAura for Graphic Era University</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #f9fafb;
+            color: #1f2937;
+        }
+
+        /* Navigation Bar */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 60px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 600;
+            color: #3b82f6;
+        }
+
+        .nav-links a {
+            margin: 0 20px;
+            text-decoration: none;
+            color: #4b5563;
+            font-size: 16px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #3b82f6;
+        }
+
+        .host-event-btn {
+            background-color: #3b82f6;
+            color: #ffffff;
+            padding: 10px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+
+        .host-event-btn:hover {
+            background-color: #2563eb;
+        }
+
+        /* Search Bar */
+        .search-bar {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .search-bar input {
+            padding: 12px 16px;
+            width: 350px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: border-color 0.3s ease;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .search-bar button {
+            padding: 12px 24px;
+            background-color: #3b82f6;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            margin-left: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .search-bar button:hover {
+            background-color: #2563eb;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            color: #ffffff;
+            padding: 120px 60px;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://via.placeholder.com/1920x600?text=Event+Background') no-repeat center center/cover;
+            opacity: 0.2;
+            z-index: 0;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 700px;
+        }
+
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 24px;
+        }
+
+        .hero p {
+            font-size: 20px;
+            font-weight: 400;
+            line-height: 1.6;
+            margin-bottom: 32px;
+            opacity: 0.9;
+        }
+
+        .hero-btn {
+            background-color: #ffffff;
+            color: #3b82f6;
+            padding: 14px 28px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            margin-right: 16px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .hero-btn:hover {
+            background-color: #f3f4f6;
+            color: #2563eb;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 80px 60px;
+            text-align: center;
+            background-color: #f9fafb;
+        }
+
+        .features h2 {
+            font-size: 40px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1f2937;
+        }
+
+        .features > p {
+            font-size: 18px;
+            color: #6b7280;
+            margin-bottom: 48px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .features-grid {
+            display: flex;
+            justify-content: space-around;
+            gap: 32px;
+        }
+
+        .feature-card {
+            background-color: #ffffff;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            width: 32%;
+            text-align: left;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card h3 {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 16px 0;
+            color: #1f2937;
+        }
+
+        .feature-card p {
+            font-size: 16px;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        .feature-card a {
+            color: #3b82f6;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            display: inline-block;
+            margin-top: 16px;
+            transition: color 0.3s ease;
+        }
+
+        .feature-card a:hover {
+            color: #2563eb;
+        }
+
+        /* Events Section */
+        .events {
+            padding: 80px 60px;
+            background-color: #ffffff;
+        }
+
+        .events-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .events-header h2 {
+            font-size: 40px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .view-all-btn {
+            background-color: transparent;
+            border: 2px solid #3b82f6;
+            color: #3b82f6;
+            padding: 10px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .view-all-btn:hover {
+            background-color: #3b82f6;
+            color: #ffffff;
+        }
+
+        .events-grid {
+            display: flex;
+            justify-content: space-around;
+            gap: 32px;
+            flex-wrap: wrap;
+        }
+
+        .event-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            width: 32%;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .event-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .event-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .event-card .status {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background-color: #3b82f6;
+            color: #ffffff;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .event-card-content {
+            padding: 24px;
+        }
+
+        .event-card h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #1f2937;
+        }
+
+        .event-card p {
+            font-size: 15px;
+            color: #6b7280;
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+
+        .event-card .details {
+            font-size: 14px;
+            color: #4b5563;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .event-card .details i {
+            margin-right: 8px;
+            font-size: 16px;
+        }
+
+        .event-card .buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .event-card .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .event-card .btn.details-btn {
+            background-color: #3b82f6;
+            color: #ffffff;
+        }
+
+        .event-card .btn.register-btn {
+            background-color: transparent;
+            border: 2px solid #3b82f6;
+            color: #3b82f6;
+        }
+
+        .event-card .btn.details-btn:hover {
+            background-color: #2563eb;
+        }
+
+        .event-card .btn.register-btn:hover {
+            background-color: #3b82f6;
+            color: #ffffff;
+        }
+
+        /* Registration Page */
+        .registration-page {
+            display: none;
+            padding: 80px 60px;
+            background-color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .registration-page.active {
+            display: block;
+        }
+
+        .registration-page h2 {
+            font-size: 40px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #1f2937;
+        }
+
+        .registration-page .event-details {
+            margin-bottom: 40px;
+            background-color: #f9fafb;
+            padding: 24px;
+            border-radius: 12px;
+        }
+
+        .registration-page .event-details p {
+            font-size: 16px;
+            margin: 12px 0;
+            color: #4b5563;
+        }
+
+        .registration-page .event-details p span {
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .registration-page .poster {
+            margin: 32px 0;
+        }
+
+        .registration-page .poster img {
+            width: 100%;
+            max-width: 450px;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .registration-page .gallery {
+            margin: 32px 0;
+        }
+
+        .registration-page .gallery h3 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1f2937;
+        }
+
+        .registration-page .gallery-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .registration-page .gallery-grid img,
+        .registration-page .gallery-grid video {
+            width: 220px;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .registration-page .register-link {
+            display: inline-block;
+            background-color: #3b82f6;
+            color: #ffffff;
+            padding: 14px 28px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            margin-top: 24px;
+            transition: background-color 0.3s ease;
+        }
+
+        .registration-page .register-link:hover {
+            background-color: #2563eb;
+        }
+
+        .registration-page .back-btn {
+            background-color: transparent;
+            border: 2px solid #3b82f6;
+            color: #3b82f6;
+            padding: 10px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 24px;
+            display: inline-block;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .registration-page .back-btn:hover {
+            background-color: #3b82f6;
+            color: #ffffff;
+        }
+
+        /* Host Event Page */
+        .host-event-page {
+            display: none;
+            padding: 80px 60px;
+            background-color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .host-event-page.active {
+            display: block;
+        }
+
+        .host-event-page h2 {
+            font-size: 40px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #1f2937;
+        }
+
+        .host-event-page form {
+            max-width: 700px;
+            margin: 0 auto;
+            background-color: #f9fafb;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .host-event-page label {
+            display: block;
+            font-size: 16px;
+            font-weight: 500;
+            margin: 12px 0 8px;
+            color: #1f2937;
+        }
+
+        .host-event-page input,
+        .host-event-page select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 16px;
+            background-color: #ffffff;
+            transition: border-color 0.3s ease;
+        }
+
+        .host-event-page input:focus,
+        .host-event-page select:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .host-event-page button {
+            background-color: #3b82f6;
+            color: #ffffff;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .host-event-page button:hover {
+            background-color: #2563eb;
+        }
+
+        .host-event-page .back-btn {
+            background-color: transparent;
+            border: 2px solid #3b82f6;
+            color: #3b82f6;
+            padding: 10px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 24px;
+            display: inline-block;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .host-event-page .back-btn:hover {
+            background-color: #3b82f6;
+            color: #ffffff;
+        }
+
+        /* Event Details Page */
+        .event-details-page {
+            display: none;
+            padding: 80px 60px;
+            background-color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .event-details-page.active {
+            display: block;
+        }
+
+        .event-details-page h2 {
+            font-size: 40px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #1f2937;
+        }
+
+        .event-details-page .event-details {
+            margin-bottom: 40px;
+            background-color: #f9fafb;
+            padding: 24px;
+            border-radius: 12px;
+        }
+
+        .event-details-page .event-details p {
+            font-size: 16px;
+            margin: 12px 0;
+            color: #4b5563;
+        }
+
+        .event-details-page .event-details p span {
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .event-details-page .poster {
+            margin: 32px 0;
+        }
+
+        .event-details-page .poster img {
+            width: 100%;
+            max-width: 450px;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .event-details-page .gallery {
+            margin: 32px 0;
+        }
+
+        .event-details-page .gallery h3 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1f2937;
+        }
+
+        .event-details-page .gallery-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .event-details-page .gallery-grid img,
+        .event-details-page .gallery-grid video {
+            width: 220px;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .event-details-page .register-link {
+            display: inline-block;
+            background-color: #3b82f6;
+            color: #ffffff;
+            padding: 14px 28px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            margin-top: 24px;
+            transition: background-color 0.3s ease;
+        }
+
+        .event-details-page .register-link:hover {
+            background-color: #2563eb;
+        }
+
+        .event-details-page .back-btn {
+            background-color: transparent;
+            border: 2px solid #3b82f6;
+            color: #3b82f6;
+            padding: 10px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 24px;
+            display: inline-block;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .event-details-page .back-btn:hover {
+            background-color: #3b82f6;
+            color: #ffffff;
+        }
+
+        /* Departments Page */
+        .departments-page {
+            display: none;
+            padding: 80px 60px;
+            background-color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .departments-page.active {
+            display: block;
+        }
+
+        .departments-page h2 {
+            font-size: 40px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #1f2937;
+        }
+
+        .departments-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 32px;
+            justify-content: space-around;
+        }
+
+        .department-card {
+            background: linear-gradient(145deg, #ffffff, #f3f4f6);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            width: 32%;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .department-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .department-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .department-card h3 {
+            font-size: 20px;
+            font-weight: 600;
+            padding: 20px;
+            text-align: center;
+            color: #1f2937;
+        }
+
+        .departments-page .back-btn {
+            background-color: transparent;
+            border: 2px solid #3b82f6;
+            color: #3b82f6;
+            padding: 10px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 24px;
+            display: inline-block;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .departments-page .back-btn:hover {
+            background-color: #3b82f6;
+            color: #ffffff;
+        }
+
+        /* Department Events Page */
+        .department-events-page {
+            display: none;
+            padding: 80px 60px;
+            background-color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .department-events-page.active {
+            display: block;
+        }
+
+        .department-events-page h2 {
+            font-size: 40px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #1f2937;
+        }
+
+        .department-events-page .no-events {
+            font-size: 18px;
+            color: #6b7280;
+            text-align: center;
+            margin-top: 32px;
+        }
+
+        .department-events-page .back-btn {
+            background-color: transparent;
+            border: 2px solid #3b82f6;
+            color: #3b82f6;
+            padding: 10px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 24px;
+            display: inline-block;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .department-events-page .back-btn:hover {
+            background-color: #3b82f6;
+            color: #ffffff;
+        }
+
+        /* Certificates Page */
+        .certificates-page {
+            display: none;
+            padding: 80px 60px;
+            background-color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .certificates-page.active {
+            display: block;
+        }
+
+        .certificates-page h2 {
+            font-size: 40px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #1f2937;
+        }
+
+        .certificates-page h3 {
+            font-size: 28px;
+            font-weight: 600;
+            margin: 40px 0 20px;
+            color: #1f2937;
+        }
+
+        .certificates-page form {
+            max-width: 700px;
+            margin: 0 auto 40px;
+            background-color: #f9fafb;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .certificates-page label {
+            display: block;
+            font-size: 16px;
+            font-weight: 500;
+            margin: 12px 0 8px;
+            color: #1f2937;
+        }
+
+        .certificates-page select,
+        .certificates-page input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 16px;
+            background-color: #ffffff;
+            transition: border-color 0.3s ease;
+        }
+
+        .certificates-page select:focus,
+        .certificates-page input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .certificates-page button {
+            background-color: #3b82f6;
+            color: #ffffff;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .certificates-page button:hover {
+            background-color: #2563eb;
+        }
+
+        .certificates-page .certificate-list {
+            margin-top: 40px;
+        }
+
+        .certificates-page .certificate-item {
+            background-color: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .certificates-page .certificate-item p {
+            font-size: 16px;
+            margin: 8px 0;
+            color: #4b5563;
+        }
+
+        .certificates-page .certificate-item a {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .certificates-page .certificate-item a:hover {
+            color: #2563eb;
+        }
+
+        .certificates-page .back-btn {
+            background-color: transparent;
+            border: 2px solid #3b82f6;
+            color: #3b82f6;
+            padding: 10px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 24px;
+            display: inline-block;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .certificates-page .back-btn:hover {
+            background-color: #3b82f6;
+            color: #ffffff;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #111827;
+            color: #d1d5db;
+            padding: 40px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 24px;
+        }
+
+        footer .logo {
+            font-size: 28px;
+            font-weight: 600;
+            color: #3b82f6;
+        }
+
+        footer .contact-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        footer .contact-section span {
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        footer .contact-section span[contenteditable] {
+            background-color: #1f2937;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: text;
+            color: #d1d5db;
+        }
+
+        footer .contact-section button {
+            background-color: #3b82f6;
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        footer .contact-section button:hover {
+            background-color: #2563eb;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav>
+        <div class="logo">EventAura</div>
+        <div class="nav-links">
+            <a href="#" onclick="showMainPage()">Home</a>
+            <a href="#" onclick="showMainPage(); document.getElementById('events').scrollIntoView()">Events</a>
+            <a href="#" onclick="showDepartmentsPage()">Departments</a>
+            <a href="#" onclick="showCertificatesPage()">Certificates</a>
+        </div>
+        <a href="#" class="host-event-btn" onclick="showHostEventPage()">Host an Event</a>
+    </nav>
+
+    <!-- Main Page -->
+    <div id="main-page">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1>EventAura for Graphic Era University</h1>
+                <p>Your central hub for all events, registrations, and certificate management at Graphic Era Deemed to be University.</p>
+                <a href="#" class="hero-btn" onclick="document.getElementById('events').scrollIntoView()">Browse University Events</a>
+                <a href="#" class="hero-btn" onclick="showHostEventPage()">Host an Event</a>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features">
+            <h2>Streamlined Event Management</h2>
+            <p>EventAura provides all the tools necessary for successful event organization at Graphic Era.</p>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>University Event Hub</h3>
+                    <p>Create and manage events across different departments with customizable registration forms.</p>
+                    <a href="#" onclick="document.getElementById('events').scrollIntoView()">Explore Events →</a>
+                </div>
+                <div class="feature-card">
+                    <h3>Departmental Coordination</h3>
+                    <p>Organize events by departments to streamline management and improve discoverability within the university.</p>
+                    <a href="#" onclick="showDepartmentsPage()">View Departments →</a>
+                </div>
+                <div class="feature-card">
+                    <h3>Certificate Issuance</h3>
+                    <p>Generate, distribute, and verify certificates for event participants and attendees.</p>
+                    <a href="#" onclick="showCertificatesPage()">Manage Certificates →</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Events Section -->
+        <section class="events" id="events">
+            <div class="search-bar">
+                <input type="text" id="search-input" placeholder="Search events...">
+                <button onclick="searchEvents()">Search</button>
+            </div>
+
+            <div class="events-header">
+                <h2>Upcoming University Events</h2>
+                <a href="#" class="view-all-btn" onclick="showAllEvents()">View All Events</a>
+            </div>
+            <div class="events-grid" id="events-grid">
+                <!-- Events will be dynamically populated -->
+            </div>
+        </section>
+    </div>
+
+    <!-- Registration Page -->
+    <div id="registration-page" class="registration-page">
+        <a href="#" class="back-btn" onclick="showMainPage()">← Back to Events</a>
+        <h2 id="event-title">Event Registration</h2>
+        <div class="event-details">
+            <p><span>Event Name:</span> <span id="event-name"></span></p>
+            <p><span>Organizer:</span> <span id="event-organizer"></span></p>
+            <p><span>Date:</span> <span id="event-date"></span></p>
+            <p><span>Time:</span> <span id="event-time"></span></p>
+            <p><span>Venue:</span> <span id="event-venue"></span></p>
+        </div>
+        <div class="poster">
+            <img id="event-poster" src="https://via.placeholder.com/400x600?text=Event+Poster" alt="Event Poster">
+        </div>
+        <div class="gallery">
+            <h3>Event Gallery</h3>
+            <div class="gallery-grid" id="event-gallery"></div>
+        </div>
+        <a id="register-link" href="#" class="register-link" target="_blank">Register Now via Google Form</a>
+    </div>
+
+    <!-- Host Event Page -->
+    <div id="host-event-page" class="host-event-page">
+        <a href="#" class="back-btn" onclick="showMainPage()">← Back to Home</a>
+        <h2>Host a New Event</h2>
+        <form id="host-event-form">
+            <label for="event-name-input">Event Name<span style="color: red;">*</span></label>
+            <input type="text" id="event-name-input" required>
+
+            <label for="event-time-input">Event Time<span style="color: red;">*</span></label>
+            <input type="time" id="event-time-input" placeholder="e.g., 09:00 AM - 05:00 PM" required>
+
+            <label for="event-date-input">Event Date<span style="color: red;">*</span></label>
+            <input type="date" id="event-date-input" required>
+
+            <label for="event-department-input">Department<span style="color: red;">*</span></label>
+            <select id="event-department-input" required>
+                <option value="Computer Science and Engineering">Computer Science and Engineering</option>
+                <option value="Civil Engineering">Civil Engineering</option>
+                <option value="Electronics and Communication Engineering">Electronics and Communication Engineering</option>
+                <option value="Biotechnology">Biotechnology</option>
+                <option value="Electrical and Computer Engineering">Electrical and Computer Engineering</option>
+                <option value="Mechanical Engineering">Mechanical Engineering</option>
+                <option value="Aerospace Engineering">Aerospace Engineering</option>
+                <option value="Petroleum Engineering and Earth Sciences">Petroleum Engineering and Earth Sciences</option>
+                <option value="Computer Application">Computer Application</option>
+                <option value="Management">Management</option>
+                <option value="Paramedical Science">Paramedical Science</option>
+                <option value="Humanities and Social Science">Humanities and Social Science</option>
+                <option value="Biosciences">Biosciences</option>
+                <option value="Commerce">Commerce</option>
+                <option value="Hospitality Management">Hospitality Management</option>
+                <option value="Food Science and Technology">Food Science and Technology</option>
+                <option value="Microbiology">Microbiology</option>
+                <option value="Allied Sciences">Allied Sciences</option>
+                <option value="Nursing">Nursing</option>
+                <option value="PDP">PDP</option>
+                <option value="Design">Design</option>
+                <option value="Law">Law</option>
+                <option value="Other">Other</option>
+            </select>
+
+            <label for="event-venue-input">Venue<span style="color: red;">*</span></label>
+            <input type="text" id="event-venue-input" required>
+
+            <label for="event-description-input">Description<span style="color: red;">*</span></label>
+            <input type="text" id="event-description-input" required>
+
+            <label for="event-poster-input">Upload Event Poster (JPG/PNG)<span style="color: red;">*</span></label>
+            <input type="file" id="event-poster-input" accept="image/jpeg,image/png" required>
+
+            <label for="event-pictures-input">Upload Event Pictures (JPG/PNG, Multiple)<span style="color: red;">*</span></label>
+            <input type="file" id="event-pictures-input" accept="image/jpeg,image/png" multiple>
+
+            <label for="event-videos-input">Upload Event Videos (MP4, Multiple)<span style="color: red;">*</span></label>
+            <input type="file" id="event-videos-input" accept="video/mp4" multiple>
+
+            <label for="event-google-form-input">Google Form Link<span style="color: red;">*</span></label>
+            <input type="text" id="event-google-form-input" placeholder="Enter Google Form URL" required>
+
+            <button type="button" onclick="handleHostEvent()">Host Event</button>
+        </form>
+    </div>
+
+    <!-- Event Details Page -->
+    <div id="event-details-page" class="event-details-page">
+        <a href="#" class="back-btn" onclick="showMainPage()">← Back to Events</a>
+        <h2 id="event-details-title">Event Details</h2>
+        <div class="event-details">
+            <p><span>Event Name:</span> <span id="event-details-name"></span></p>
+            <p><span>Organizer:</span> <span id="event-details-organizer"></span></p>
+            <p><span>Date:</span> <span id="event-details-date"></span></p>
+            <p><span>Time:</span> <span id="event-details-time"></span></p>
+            <p><span>Venue:</span> <span id="event-details-venue"></span></p>
+            <p><span>Description:</span> <span id="event-details-description"></span></p>
+        </div>
+        <div class="poster">
+            <img id="event-details-poster" src="https://via.placeholder.com/400x600?text=Event+Poster" alt="Event Poster">
+        </div>
+        <div class="gallery">
+            <h3>Event Gallery</h3>
+            <div class="gallery-grid" id="event-details-gallery"></div>
+        </div>
+        <a id="details-register-link" href="#" class="register-link" target="_blank">Register Now via Google Form</a>
+    </div>
+
+    <!-- Departments Page -->
+    <div id="departments-page" class="departments-page">
+        <a href="#" class="back-btn" onclick="showMainPage()">← Back to Home</a>
+        <h2>Departments</h2>
+        <div class="departments-grid">
+            <div class="department-card" data-department="Computer Science and Engineering">
+                <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1470&auto=format&fit=crop" alt="Computer Science">
+                <h3>Computer Science and Engineering</h3>
+            </div>
+            <div class="department-card" data-department="Civil Engineering">
+                <img src="https://images.unsplash.com/photo-1504307651254-35680f356847?q=80&w=1476&auto=format&fit=crop" alt="Civil Engineering">
+                <h3>Civil Engineering</h3>
+            </div>
+            <div class="department-card" data-department="Electronics and Communication Engineering">
+                <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1470&auto=format&fit=crop" alt="Electronics">
+                <h3>Electronics and Communication Engineering</h3>
+            </div>
+            <div class="department-card" data-department="Biotechnology">
+                <img src="https://images.unsplash.com/photo-1576091160397-5d4be1f44c9f?q=80&w=1470&auto=format&fit=crop" alt="Biotechnology">
+                <h3>Biotechnology</h3>
+            </div>
+            <div class="department-card" data-department="Electrical and Computer Engineering">
+                <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1470&auto=format&fit=crop" alt="Electrical Engineering">
+                <h3>Electrical and Computer Engineering</h3>
+            </div>
+            <div class="department-card" data-department="Mechanical Engineering">
+                <img src="https://images.unsplash.com/photo-1581091877018-4e4d1e1c6959?q=80&w=1470&auto=format&fit=crop" alt="Mechanical Engineering">
+                <h3>Mechanical Engineering</h3>
+            </div>
+            <div class="department-card" data-department="Aerospace Engineering">
+                <img src="https://images.unsplash.com/photo-1605462854648-9f4b9a86d7b7?q=80&w=1470&auto=format&fit=crop" alt="Aerospace Engineering">
+                <h3>Aerospace Engineering</h3>
+            </div>
+            <div class="department-card" data-department="Petroleum Engineering and Earth Sciences">
+                <img src="https://images.unsplash.com/photo-1598293609817-9c6e2517b7f0?q=80&w=1470&auto=format&fit=crop" alt="Petroleum Engineering">
+                <h3>Petroleum Engineering and Earth Sciences</h3>
+            </div>
+            <div class="department-card" data-department="Computer Application">
+                <img src="https://images.unsplash.com/photo-1532619187608-e5375cab36aa?q=80&w=1470&auto=format&fit=crop" alt="Computer Application">
+                <h3>Computer Application</h3>
+            </div>
+            <div class="department-card" data-department="Management">
+                <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=1470&auto=format&fit=crop" alt="Management">
+                <h3>Management</h3>
+            </div>
+            <div class="department-card" data-department="Paramedical Science">
+                <img src="https://images.unsplash.com/photo-1585435557343-3b092031a831?q=80&w=1470&auto=format&fit=crop" alt="Paramedical Science">
+                <h3>Paramedical Science</h3>
+            </div>
+            <div class="department-card" data-department="Humanities and Social Science">
+                <img src="https://images.unsplash.com/photo-1503676260728-1b37d7e9c6b9?q=80&w=1470&auto=format&fit=crop" alt="Humanities">
+                <h3>Humanities and Social Science</h3>
+            </div>
+            <div class="department-card" data-department="Biosciences">
+                <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1470&auto=format&fit=crop" alt="Biosciences">
+                <h3>Biosciences</h3>
+            </div>
+            <div class="department-card" data-department="Commerce">
+                <img src="https://images.unsplash.com/photo-1556157382-97eda2d62296?q=80&w=1470&auto=format&fit=crop" alt="Commerce">
+                <h3>Commerce</h3>
+            </div>
+            <div class="department-card" data-department="Hospitality Management">
+                <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=1470&auto=format&fit=crop" alt="Hospitality Management">
+                <h3>Hospitality Management</h3>
+            </div>
+            <div class="department-card" data-department="Food Science and Technology">
+                <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1470&auto=format&fit=crop" alt="Food Science">
+                <h3>Food Science and Technology</h3>
+            </div>
+            <div class="department-card" data-department="Microbiology">
+                <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1470&auto=format&fit=crop" alt="Microbiology">
+                <h3>Microbiology</h3>
+            </div>
+            <div class="department-card" data-department="Allied Sciences">
+                <img src="https://images.unsplash.com/photo-1585435557343-3b092031a831?q=80&w=1470&auto=format&fit=crop" alt="Allied Sciences">
+                <h3>Allied Sciences</h3>
+            </div>
+            <div class="department-card" data-department="Nursing">
+                <img src="https://images.unsplash.com/photo-1576766125535-b2e6d460da0b?q=80&w=1470&auto=format&fit=crop" alt="Nursing">
+                <h3>Nursing</h3>
+            </div>
+            <div class="department-card" data-department="PDP">
+                <img src="https://images.unsplash.com/photo-1503676260728-1b37d7e9c6b9?q=80&w=1470&auto=format&fit=crop" alt="PDP">
+                <h3>PDP</h3>
+            </div>
+            <div class="department-card" data-department="Design">
+                <img src="https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?q=80&w=1470&auto=format&fit=crop" alt="Design">
+                <h3>Design</h3>
+            </div>
+            <div class="department-card" data-department="Law">
+                <img src="https://images.unsplash.com/photo-1589998059171-988d887df646?q=80&w=1470&auto=format&fit=crop" alt="Law">
+                <h3>Law</h3>
+            </div>
+            <div class="department-card" data-department="Other">
+                <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1470&auto=format&fit=crop" alt="Other">
+                <h3>Other</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Department Events Page -->
+    <div id="department-events-page" class="department-events-page">
+        <a href="#" class="back-btn" onclick="showDepartmentsPage()">← Back to Departments</a>
+        <h2 id="department-events-title">Department Events</h2>
+        <div class="events-grid" id="department-events-grid"></div>
+        <div id="no-events-message" class="no-events" style="display: none;">Sorry, no events ongoing.</div>
+    </div>
+
+    <!-- Certificates Page -->
+    <div id="certificates-page" class="certificates-page">
+        <a href="#" class="back-btn" onclick="showMainPage()">← Back to Home</a>
+        <h2>Manage Certificates</h2>
+
+        <h3>For Organizers: Upload Certificates</h3>
+        <form id="certificate-upload-form">
+            <label for="certificate-event-select">Select Event</label>
+            <select id="certificate-event-select" required>
+            </select>
+
+            <label for="certificate-file-input">Upload Certificate (PDF)</label>
+            <input type="file" id="certificate-file-input" accept="application/pdf" required>
+
+            <button type="button" onclick="uploadCertificate()">Upload Certificate</button>
+        </form>
+
+        <div class="certificate-list" id="certificate-list">
+        </div>
+
+        <h3>For Participants: Download Certificates</h3>
+        <form id="certificate-download-form">
+            <label for="participant-event-select">Select Event You Participated In</label>
+            <select id="participant-event-select" required>
+            </select>
+
+            <button type="button" onclick="downloadCertificate()">Download Certificate</button>
+        </form>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="logo">EventAura</div>
+        <div class="contact-section">
+            <span>Contact Us: </span>
+            <span id="contact-info" contenteditable="true">contact@eventaura.com</span>
+            <button onclick="saveContactInfo()">Save</button>
+        </div>
+    </footer>
+
+    <script>
+        let events = {};
+        let certificates = [];
+        const currentParticipant = 'participant1@example.com';
+
+        const mainPage = document.getElementById('main-page');
+        const registrationPage = document.getElementById('registration-page');
+        const hostEventPage = document.getElementById('host-event-page');
+        const eventDetailsPage = document.getElementById('event-details-page');
+        const departmentsPage = document.getElementById('departments-page');
+        const departmentEventsPage = document.getElementById('department-events-page');
+        const certificatesPage = document.getElementById('certificates-page');
+
+        // Load data from localStorage on page load
+        window.onload = function() {
+            const savedEvents = localStorage.getItem('events');
+            if (savedEvents) {
+                events = JSON.parse(savedEvents);
+            }
+
+            const savedCertificates = localStorage.getItem('certificates');
+            if (savedCertificates) {
+                certificates = JSON.parse(savedCertificates);
+            }
+
+            const savedContactInfo = localStorage.getItem('contactInfo');
+            if (savedContactInfo) {
+                document.getElementById('contact-info').textContent = savedContactInfo;
+            }
+
+            renderEvents();
+        };
+
+        function saveEventsToLocalStorage() {
+            localStorage.setItem('events', JSON.stringify(events));
+        }
+
+        function saveCertificatesToLocalStorage() {
+            localStorage.setItem('certificates', JSON.stringify(certificates));
+        }
+
+        function renderEvents() {
+            const eventsGrid = document.getElementById('events-grid');
+            eventsGrid.innerHTML = '';
+
+            Object.keys(events).forEach(eventId => {
+                const event = events[eventId];
+                const eventCard = document.createElement('div');
+                eventCard.className = 'event-card';
+                eventCard.dataset.event = eventId;
+                eventCard.innerHTML = `
+                    <div style="position: relative;">
+                        <img src="${event.poster}" alt="${event.name}">
+                        <span class="status">Upcoming</span>
+                    </div>
+                    <div class="event-card-content">
+                        <h3>${event.name}</h3>
+                        <p>${event.description}</p>
+                        <div class="details"><i>📅</i> ${event.date}</div>
+                        <div class="details"><i>⏰</i> ${event.time}</div>
+                        <div class="details"><i>📍</i> ${event.venue}</div>
+                        <div class="buttons">
+                            <a href="#" class="btn details-btn">Details</a>
+                            <a href="#" class="btn register-btn">Register</a>
+                        </div>
+                    </div>
+                `;
+                eventsGrid.appendChild(eventCard);
+
+                eventCard.querySelector('.details-btn').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    showEventDetailsPage(eventId);
+                });
+
+                eventCard.querySelector('.register-btn').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    showRegistrationPage(eventId);
+                });
+            });
+        }
+
+        function showMainPage() {
+            mainPage.style.display = 'block';
+            registrationPage.classList.remove('active');
+            hostEventPage.classList.remove('active');
+            eventDetailsPage.classList.remove('active');
+            departmentsPage.classList.remove('active');
+            departmentEventsPage.classList.remove('active');
+            certificatesPage.classList.remove('active');
+        }
+
+        function showRegistrationPage(eventId) {
+            mainPage.style.display = 'none';
+            registrationPage.classList.add('active');
+            hostEventPage.classList.remove('active');
+            eventDetailsPage.classList.remove('active');
+            departmentsPage.classList.remove('active');
+            departmentEventsPage.classList.remove('active');
+            certificatesPage.classList.remove('active');
+
+            const event = events[eventId];
+            document.getElementById('event-title').textContent = `${event.name} Registration`;
+            document.getElementById('event-name').textContent = event.name;
+            document.getElementById('event-organizer').textContent = event.organizer;
+            document.getElementById('event-date').textContent = event.date;
+            document.getElementById('event-time').textContent = event.time;
+            document.getElementById('event-venue').textContent = event.venue;
+            document.getElementById('event-poster').src = event.poster;
+
+            const gallery = document.getElementById('event-gallery');
+            gallery.innerHTML = '';
+            if (event.pictures && event.pictures.length > 0) {
+                event.pictures.forEach(picUrl => {
+                    const img = document.createElement('img');
+                    img.src = picUrl;
+                    img.alt = `${event.name} Picture`;
+                    gallery.appendChild(img);
+                });
+            }
+            if (event.videos && event.videos.length > 0) {
+                event.videos.forEach(videoUrl => {
+                    const video = document.createElement('video');
+                    video.src = videoUrl;
+                    video.controls = true;
+                    video.alt = `${event.name} Video`;
+                    gallery.appendChild(video);
+                });
+            }
+            if ((!event.pictures || event.pictures.length === 0) && (!event.videos || event.videos.length === 0)) {
+                gallery.innerHTML = '<p>No media available.</p>';
+            }
+
+            document.getElementById('register-link').href = "form.html";
+
+            if (!event.participants.includes(currentParticipant)) {
+                event.participants.push(currentParticipant);
+                saveEventsToLocalStorage();
+            }
+        }
+
+        function showHostEventPage() {
+            mainPage.style.display = 'none';
+            registrationPage.classList.remove('active');
+            hostEventPage.classList.add('active');
+            eventDetailsPage.classList.remove('active');
+            departmentsPage.classList.remove('active');
+            departmentEventsPage.classList.remove('active');
+            certificatesPage.classList.remove('active');
+        }
+
+        function showEventDetailsPage(eventId) {
+            mainPage.style.display = 'none';
+            registrationPage.classList.remove('active');
+            hostEventPage.classList.remove('active');
+            eventDetailsPage.classList.add('active');
+            departmentsPage.classList.remove('active');
+            departmentEventsPage.classList.remove('active');
+            certificatesPage.classList.remove('active');
+
+            const event = events[eventId];
+            document.getElementById('event-details-title').textContent = `${event.name} Details`;
+            document.getElementById('event-details-name').textContent = event.name;
+            document.getElementById('event-details-organizer').textContent = event.organizer;
+            document.getElementById('event-details-date').textContent = event.date;
+            document.getElementById('event-details-time').textContent = event.time;
+            document.getElementById('event-details-venue').textContent = event.venue;
+            document.getElementById('event-details-description').textContent = event.description;
+            document.getElementById('event-details-poster').src = event.poster;
+
+            const gallery = document.getElementById('event-details-gallery');
+            gallery.innerHTML = '';
+            if (event.pictures && event.pictures.length > 0) {
+                event.pictures.forEach(picUrl => {
+                    const img = document.createElement('img');
+                    img.src = picUrl;
+                    img.alt = `${event.name} Picture`;
+                    gallery.appendChild(img);
+                });
+            }
+            if (event.videos && event.videos.length > 0) {
+                event.videos.forEach(videoUrl => {
+                    const video = document.createElement('video');
+                    video.src = videoUrl;
+                    video.controls = true;
+                    video.alt = `${event.name} Video`;
+                    gallery.appendChild(video);
+                });
+            }
+            if ((!event.pictures || event.pictures.length === 0) && (!event.videos || event.videos.length === 0)) {
+                gallery.innerHTML = '<p>No media available.</p>';
+            }
+
+            document.getElementById('details-register-link').href = event.googleFormLink;
+        }
+
+        function showDepartmentsPage() {
+            mainPage.style.display = 'none';
+            registrationPage.classList.remove('active');
+            hostEventPage.classList.remove('active');
+            eventDetailsPage.classList.remove('active');
+            departmentsPage.classList.add('active');
+            departmentEventsPage.classList.remove('active');
+            certificatesPage.classList.remove('active');
+        }
+
+        function showDepartmentEventsPage(department) {
+            mainPage.style.display = 'none';
+            registrationPage.classList.remove('active');
+            hostEventPage.classList.remove('active');
+            eventDetailsPage.classList.remove('active');
+            departmentsPage.classList.remove('active');
+            departmentEventsPage.classList.add('active');
+            certificatesPage.classList.remove('active');
+
+            document.getElementById('department-events-title').textContent = `${department} Events`;
+            const departmentEventsGrid = document.getElementById('department-events-grid');
+            const noEventsMessage = document.getElementById('no-events-message');
+            departmentEventsGrid.innerHTML = '';
+
+            let hasEvents = false;
+            Object.keys(events).forEach(eventId => {
+                const event = events[eventId];
+                if (event.organizer === department) {
+                    hasEvents = true;
+                    const eventCard = document.createElement('div');
+                    eventCard.className = 'event-card';
+                    eventCard.dataset.event = eventId;
+                    eventCard.innerHTML = `
+                        <div style="position: relative;">
+                            <img src="${event.poster}" alt="${event.name}">
+                            <span class="status">Upcoming</span>
+                        </div>
+                        <div class="event-card-content">
+                            <h3>${event.name}</h3>
+                            <p>${event.description}</p>
+                            <div class="details"><i>📅</i> ${event.date}</div>
+                            <div class="details"><i>⏰</i> ${event.time}</div>
+                            <div class="details"><i>📍</i> ${event.venue}</div>
+                            <div class="buttons">
+                                <a href="#" class="btn details-btn">Details</a>
+                                <a href="#" class="btn register-btn">Register</a>
+                            </div>
+                        </div>
+                    `;
+                    departmentEventsGrid.appendChild(eventCard);
+
+                    eventCard.querySelector('.details-btn').addEventListener('click', (e) => {
+                        e.preventDefault();
+                        showEventDetailsPage(eventId);
+                    });
+
+                    eventCard.querySelector('.register-btn').addEventListener('click', (e) => {
+                        e.preventDefault();
+                        showRegistrationPage(eventId);
+                    });
+                }
+            });
+
+            noEventsMessage.style.display = hasEvents ? 'none' : 'block';
+        }
+
+        function showCertificatesPage() {
+            mainPage.style.display = 'none';
+            registrationPage.classList.remove('active');
+            hostEventPage.classList.remove('active');
+            eventDetailsPage.classList.remove('active');
+            departmentsPage.classList.remove('active');
+            departmentEventsPage.classList.remove('active');
+            certificatesPage.classList.add('active');
+
+            const eventSelect = document.getElementById('certificate-event-select');
+            eventSelect.innerHTML = '<option value="">Select an event</option>';
+            Object.keys(events).forEach(eventId => {
+                const event = events[eventId];
+                const option = document.createElement('option');
+                option.value = eventId;
+                option.textContent = event.name;
+                eventSelect.appendChild(option);
+            });
+
+            const certificateList = document.getElementById('certificate-list');
+            certificateList.innerHTML = '';
+            certificates.forEach(cert => {
+                const certItem = document.createElement('div');
+                certItem.className = 'certificate-item';
+                certItem.innerHTML = `
+                    <p><strong>Event:</strong> ${events[cert.eventId].name}</p>
+                    <p><strong>File:</strong> <a href="${cert.fileUrl}" target="_blank">${cert.fileName}</a></p>
+                `;
+                certificateList.appendChild(certItem);
+            });
+
+            const participantEventSelect = document.getElementById('participant-event-select');
+            participantEventSelect.innerHTML = '<option value="">Select an event</option>';
+            Object.keys(events).forEach(eventId => {
+                const event = events[eventId];
+                if (event.participants.includes(currentParticipant)) {
+                    const option = document.createElement('option');
+                    option.value = eventId;
+                    option.textContent = event.name;
+                    participantEventSelect.appendChild(option);
+                }
+            });
+        }
+
+        function handleHostEvent() {
+            const name = document.getElementById('event-name-input').value;
+            const time = document.getElementById('event-time-input').value;
+            const date = document.getElementById('event-date-input').value;
+            const department = document.getElementById('event-department-input').value;
+            const venue = document.getElementById('event-venue-input').value;
+            const description = document.getElementById('event-description-input').value;
+            const posterFile = document.getElementById('event-poster-input').files[0];
+            const pictureFiles = document.getElementById('event-pictures-input').files;
+            const videoFiles = document.getElementById('event-videos-input').files;
+            const googleFormLink = document.getElementById('event-google-form-input').value;
+
+            if (!name || !time || !date || !department || !venue || !description || !posterFile || !googleFormLink) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+
+            if (!['image/jpeg', 'image/png'].includes(posterFile.type)) {
+                alert('Please upload a JPG or PNG image for the event poster.');
+                return;
+            }
+	
+	
+            const pictureUrls = [];
+            for (let i = 0; i < pictureFiles.length; i++) {
+                const file = pictureFiles[i];
+                if (['image/jpeg', 'image/png'].includes(file.type)) {
+                    pictureUrls.push(URL.createObjectURL(file));
+                } else {
+                    alert(`File ${file.name} is not a valid JPG or PNG image and will be skipped.`);
+                }
+            }
+
+            const videoUrls = [];
+            for (let i = 0; i < videoFiles.length; i++) {
+                const file = videoFiles[i];
+                if (['video/mp4'].includes(file.type)) {
+                    videoUrls.push(URL.createObjectURL(file));
+                } else {
+                    alert(`File ${file.name} is not a valid MP4 video and will be skipped.`);
+                }
+            }
+
+            const eventId = name.toLowerCase().replace(/\s+/g, '-');
+            const posterUrl = URL.createObjectURL(posterFile);
+
+            events[eventId] = {
+                name,
+                organizer: department,
+                date,
+                time,
+                venue,
+                description,
+                googleFormLink,
+                poster: posterUrl,
+                pictures: pictureUrls,
+                videos: videoUrls,
+                participants: []
+            };
+
+            saveEventsToLocalStorage();
+            renderEvents();
+
+            document.getElementById('host-event-form').reset();
+            showMainPage();
+        }
+
+        function searchEvents() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const eventsGrid = document.getElementById('events-grid');
+            eventsGrid.innerHTML = '';
+
+            Object.keys(events).forEach(eventId => {
+                const event = events[eventId];
+                if (event.name.toLowerCase().includes(searchTerm) || event.description.toLowerCase().includes(searchTerm)) {
+                    const eventCard = document.createElement('div');
+                    eventCard.className = 'event-card';
+                    eventCard.dataset.event = eventId;
+                    eventCard.innerHTML = `
+                        <div style="position: relative;">
+                            <img src="${event.poster}" alt="${event.name}">
+                            <span class="status">Upcoming</span>
+                        </div>
+                        <div class="event-card-content">
+                            <h3>${event.name}</h3>
+                            <p>${event.description}</p>
+                            <div class="details"><i>📅</i> ${event.date}</div>
+                            <div class="details"><i>⏰</i> ${event.time}</div>
+                            <div class="details"><i>📍</i> ${event.venue}</div>
+                            <div class="buttons">
+                                <a href="#" class="btn details-btn">Details</a>
+                                <a href="#" class="btn register-btn">Register</a>
+                            </div>
+                        </div>
+                    `;
+                    eventsGrid.appendChild(eventCard);
+
+                    eventCard.querySelector('.details-btn').addEventListener('click', (e) => {
+                        e.preventDefault();
+                        showEventDetailsPage(eventId);
+                    });
+
+                    eventCard.querySelector('.register-btn').addEventListener('click', (e) => {
+                        e.preventDefault();
+                        showRegistrationPage(eventId);
+                    });
+                }
+            });
+        }
+
+        function showAllEvents() {
+            document.getElementById('search-input').value = '';
+            renderEvents();
+        }
+
+        document.querySelectorAll('.department-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const department = card.dataset.department;
+                showDepartmentEventsPage(department);
+            });
+        });
+
+        function uploadCertificate() {
+            const eventId = document.getElementById('certificate-event-select').value;
+            const fileInput = document.getElementById('certificate-file-input');
+            const file = fileInput.files[0];
+
+            if (!eventId || !file) {
+                alert('Please select an event and upload a PDF file.');
+                return;
+            }
+
+            if (file.type !== 'application/pdf') {
+                alert('Please upload a PDF file.');
+                return;
+            }
+
+            const fileUrl = URL.createObjectURL(file);
+            certificates.push({
+                eventId,
+                fileName: file.name,
+                fileUrl
+            });
+
+            saveCertificatesToLocalStorage();
+            document.getElementById('certificate-upload-form').reset();
+            showCertificatesPage();
+        }
+
+        function downloadCertificate() {
+            const eventId = document.getElementById('participant-event-select').value;
+
+            if (!eventId) {
+                alert('Please select an event.');
+                return;
+            }
+
+            const certificate = certificates.find(cert => cert.eventId === eventId);
+            if (!certificate) {
+                alert('No certificate available for this event.');
+                return;
+            }
+
+            const link = document.createElement('a');
+            link.href = certificate.fileUrl;
+            link.download = certificate.fileName;
+            link.click();
+        }
+
+        function saveContactInfo() {
+            const contactInfo = document.getElementById('contact-info').textContent.trim();
+            if (contactInfo) {
+                localStorage.setItem('contactInfo', contactInfo);
+                alert('Contact information saved!');
+            } else {
+                alert('Please enter valid contact information.');
+            }
+        }
+    </script>
+</body>
+</html>
