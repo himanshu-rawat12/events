@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>College Event Registration Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      padding: 20px;
+    }
+    .container {
+      background: #fff;
+      padding: 25px;
+      border-radius: 8px;
+      max-width: 800px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+    .member {
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+    }
+    .member h3 {
+      margin-top: 0;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+    }
+    .submit-btn {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    .submit-btn:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>College Event Registration Form</h2>
+    <form action="/submit_registration" method="post">
+      <!-- Team Leader -->
+      <div class="member">
+        <h3>Team Leader Details</h3>
+        <label for="leader_name">Name:<span style="color: red;">*</span></label>
+        <input type="text" id="leader_name" name="leader_name" required>
+
+        <label for="leader_roll">University Roll Number:<span style="color: red;">*</span></label>
+        <input type="text" id="leader_roll" name="leader_roll" required>
+
+        <label for="leader_section">Section:<span style="color: red;">*</span></label>
+        <input type="text" id="leader_section" name="leader_section" required>
+
+        <label for="leader_year">Year:<span style="color: red;">*</span></label>
+        <select id="leader_year" name="leader_year" required>
+          <option value="">--Select Year--</option>
+          <option value="1st">1st Year</option>
+          <option value="2nd">2nd Year</option>
+          <option value="3rd">3rd Year</option>
+          <option value="4th">4th Year</option>
+        </select>
+
+        <label for="leader_course">Course:<span style="color: red;">*</span></label>
+        <input type="text" id="leader_course" name="leader_course" required>
+      </div>
+
+      <!-- Member 2 -->
+      <div class="member">
+        <h3>Team Member 2</h3>
+        <label for="member2_name">Name:<span style="color: red;">*</span></label>
+        <input type="text" id="member2_name" name="member2_name" required>
+
+        <label for="member2_roll">University Roll Number:<span style="color: red;">*</span></label>
+        <input type="text" id="member2_roll" name="member2_roll" required>
+
+        <label for="member2_section">Section:<span style="color: red;">*</span></label>
+        <input type="text" id="member2_section" name="member2_section" required>
+
+        <label for="member2_year">Year:<span style="color: red;">*</span></label>
+        <select id="member2_year" name="member2_year" required>
+          <option value="">--Select Year--<span style="color: red;">*</span></option>
+          <option value="1st">1st Year</option>
+          <option value="2nd">2nd Year</option>
+          <option value="3rd">3rd Year</option>
+          <option value="4th">4th Year</option>
+        </select>
+
+        <label for="member2_course">Course:<span style="color: red;">*</span></label>
+        <input type="text" id="member2_course" name="member2_course" required>
+      </div>
+
+      <!-- Member 3 -->
+      <div class="member">
+        <h3>Team Member 3</h3>
+        <label for="member3_name">Name:<span style="color: red;">*</span></label>
+        <input type="text" id="member3_name" name="member3_name" required>
+
+        <label for="member3_roll">University Roll Number:<span style="color: red;">*</span></label>
+        <input type="text" id="member3_roll" name="member3_roll" required>
+
+        <label for="member3_section">Section:<span style="color: red;">*</span></label>
+        <input type="text" id="member3_section" name="member3_section" required>
+
+        <label for="member3_year">Year:<span style="color: red;">*</span></label>
+        <select id="member3_year" name="member3_year" required>
+          <option value="">--Select Year--<span style="color: red;">*</span></option>
+          <option value="1st">1st Year</option>
+          <option value="2nd">2nd Year</option>
+          <option value="3rd">3rd Year</option>
+          <option value="4th">4th Year</option>
+        </select>
+
+        <label for="member3_course">Course:<span style="color: red;">*</span></label>
+        <input type="text" id="member3_course" name="member3_course" required>
+      </div>
+
+      <!-- Member 4 (Optional) -->
+      <div class="member">
+        <h3>Team Member 4 (Optional)</h3>
+        <label for="member4_name">Name:</label>
+        <input type="text" id="member4_name" name="member4_name">
+
+        <label for="member4_roll">University Roll Number:</label>
+        <input type="text" id="member4_roll" name="member4_roll">
+
+        <label for="member4_section">Section:</label>
+        <input type="text" id="member4_section" name="member4_section">
+
+        <label for="member4_year">Year:</label>
+        <select id="member4_year" name="member4_year">
+          <option value="">--Select Year--</option>
+          <option value="1st">1st Year</option>
+          <option value="2nd">2nd Year</option>
+          <option value="3rd">3rd Year</option>
+          <option value="4th">4th Year</option>
+        </select>
+
+        <label for="member4_course">Course:</label>
+        <input type="text" id="member4_course" name="member4_course">
+      </div>
+
+      <div style="text-align: center;">
+        <button type="submit" class="submit-btn">Submit Registration</button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>
