@@ -1160,15 +1160,6 @@
             <label for="event-poster-input">Upload Event Poster (JPG/PNG)<span style="color: red;">*</span></label>
             <input type="file" id="event-poster-input" accept="image/jpeg,image/png" required>
 
-            <label for="event-pictures-input">Upload Event Pictures (JPG/PNG, Multiple)<span style="color: red;">*</span></label>
-            <input type="file" id="event-pictures-input" accept="image/jpeg,image/png" multiple>
-
-            <label for="event-videos-input">Upload Event Videos (MP4, Multiple)<span style="color: red;">*</span></label>
-            <input type="file" id="event-videos-input" accept="video/mp4" multiple>
-
-            <label for="event-google-form-input">Google Form Link<span style="color: red;">*</span></label>
-            <input type="text" id="event-google-form-input" placeholder="Enter Google Form URL" required>
-
             <button type="button" onclick="handleHostEvent()">Host Event</button>
         </form>
     </div>
@@ -1188,11 +1179,8 @@
         <div class="poster">
             <img id="event-details-poster" src="https://via.placeholder.com/400x600?text=Event+Poster" alt="Event Poster">
         </div>
-        <div class="gallery">
-            <h3>Event Gallery</h3>
-            <div class="gallery-grid" id="event-details-gallery"></div>
-        </div>
-        <a id="details-register-link" href="#" class="register-link" target="_blank">Register Now via Google Form</a>
+		 <a id="details-register-link" href="form.html" class="register-link" target="_blank">Register Now!</a>
+
     </div>
 
     <!-- Departments Page -->
@@ -1406,9 +1394,11 @@
                         <div class="details"><i>📍</i> ${event.venue}</div>
                         <div class="buttons">
                             <a href="#" class="btn details-btn">Details</a>
-                            <a href="#" class="btn register-btn">Register</a>
+                            <a href="form.html" class="btn register-btn" target="_blank">Register</a>
+							<button  class="btn register-btn" onclick="showRegistrations()">Show Registrations</button>
                         </div>
                     </div>
+					<div id="registration-output"></div>
                 `;
                 eventsGrid.appendChild(eventCard);
 
@@ -1417,12 +1407,38 @@
                     showEventDetailsPage(eventId);
                 });
 
-                eventCard.querySelector('.register-btn').addEventListener('click', (e) => {
-                    e.preventDefault();
-                    showRegistrationPage(eventId);
-                });
+               
             });
         }
+		
+		
+	function showRegistrations() {
+    const data = JSON.parse(localStorage.getItem('eventRegistration'));
+    if (!data) {
+      document.getElementById('registration-output').innerHTML = "<p>No registrations found.</p>";
+      return;
+    }
+
+    const renderMember = (member, label) => `
+      <h3>${label}</h3>
+      <p><strong>Name:</strong> ${member.name || 'N/A'}</p>
+      <p><strong>Roll:</strong> ${member.roll || 'N/A'}</p>
+      <p><strong>Section:</strong> ${member.section || 'N/A'}</p>
+      <p><strong>Year:</strong> ${member.year || 'N/A'}</p>
+      <p><strong>Course:</strong> ${member.course || 'N/A'}</p>
+      <hr>
+    `;
+
+    document.getElementById('registration-output').innerHTML = `
+      ${renderMember(data.leader, 'Team Leader')}
+      ${renderMember(data.member2, 'Team Member 2')}
+      ${renderMember(data.member3, 'Team Member 3')}
+      ${data.member4.name ? renderMember(data.member4, 'Team Member 4') : ''}
+    `;
+  }
+  
+  
+  
 
         function showMainPage() {
             mainPage.style.display = 'block';
@@ -1450,30 +1466,7 @@
             document.getElementById('event-date').textContent = event.date;
             document.getElementById('event-time').textContent = event.time;
             document.getElementById('event-venue').textContent = event.venue;
-            document.getElementById('event-poster').src = event.poster;
-
-            const gallery = document.getElementById('event-gallery');
-            gallery.innerHTML = '';
-            if (event.pictures && event.pictures.length > 0) {
-                event.pictures.forEach(picUrl => {
-                    const img = document.createElement('img');
-                    img.src = picUrl;
-                    img.alt = `${event.name} Picture`;
-                    gallery.appendChild(img);
-                });
-            }
-            if (event.videos && event.videos.length > 0) {
-                event.videos.forEach(videoUrl => {
-                    const video = document.createElement('video');
-                    video.src = videoUrl;
-                    video.controls = true;
-                    video.alt = `${event.name} Video`;
-                    gallery.appendChild(video);
-                });
-            }
-            if ((!event.pictures || event.pictures.length === 0) && (!event.videos || event.videos.length === 0)) {
-                gallery.innerHTML = '<p>No media available.</p>';
-            }
+            document.getElementById('event-poster').src = event.poster; 
 
             document.getElementById('register-link').href = "form.html";
 
@@ -1512,30 +1505,7 @@
             document.getElementById('event-details-description').textContent = event.description;
             document.getElementById('event-details-poster').src = event.poster;
 
-            const gallery = document.getElementById('event-details-gallery');
-            gallery.innerHTML = '';
-            if (event.pictures && event.pictures.length > 0) {
-                event.pictures.forEach(picUrl => {
-                    const img = document.createElement('img');
-                    img.src = picUrl;
-                    img.alt = `${event.name} Picture`;
-                    gallery.appendChild(img);
-                });
-            }
-            if (event.videos && event.videos.length > 0) {
-                event.videos.forEach(videoUrl => {
-                    const video = document.createElement('video');
-                    video.src = videoUrl;
-                    video.controls = true;
-                    video.alt = `${event.name} Video`;
-                    gallery.appendChild(video);
-                });
-            }
-            if ((!event.pictures || event.pictures.length === 0) && (!event.videos || event.videos.length === 0)) {
-                gallery.innerHTML = '<p>No media available.</p>';
-            }
-
-            document.getElementById('details-register-link').href = event.googleFormLink;
+        
         }
 
         function showDepartmentsPage() {
@@ -1649,71 +1619,50 @@
         }
 
         function handleHostEvent() {
-            const name = document.getElementById('event-name-input').value;
-            const time = document.getElementById('event-time-input').value;
-            const date = document.getElementById('event-date-input').value;
-            const department = document.getElementById('event-department-input').value;
-            const venue = document.getElementById('event-venue-input').value;
-            const description = document.getElementById('event-description-input').value;
-            const posterFile = document.getElementById('event-poster-input').files[0];
-            const pictureFiles = document.getElementById('event-pictures-input').files;
-            const videoFiles = document.getElementById('event-videos-input').files;
-            const googleFormLink = document.getElementById('event-google-form-input').value;
+    const name = document.getElementById('event-name-input').value;
+    const time = document.getElementById('event-time-input').value;
+    const date = document.getElementById('event-date-input').value;
+    const department = document.getElementById('event-department-input').value;
+    const venue = document.getElementById('event-venue-input').value;
+    const description = document.getElementById('event-description-input').value;
+    const posterFile = document.getElementById('event-poster-input').files[0];
 
-            if (!name || !time || !date || !department || !venue || !description || !posterFile || !googleFormLink) {
-                alert('Please fill in all required fields.');
-                return;
-            }
+    if (!name || !time || !date || !department || !venue || !description || !posterFile) {
+        alert('Please fill in all required fields.');
+        return;
+    }
 
-            if (!['image/jpeg', 'image/png'].includes(posterFile.type)) {
-                alert('Please upload a JPG or PNG image for the event poster.');
-                return;
-            }
-	
-	
-            const pictureUrls = [];
-            for (let i = 0; i < pictureFiles.length; i++) {
-                const file = pictureFiles[i];
-                if (['image/jpeg', 'image/png'].includes(file.type)) {
-                    pictureUrls.push(URL.createObjectURL(file));
-                } else {
-                    alert(`File ${file.name} is not a valid JPG or PNG image and will be skipped.`);
-                }
-            }
+    if (!['image/jpeg', 'image/png'].includes(posterFile.type)) {
+        alert('Please upload a JPG or PNG image for the event poster.');
+        return;
+    }
 
-            const videoUrls = [];
-            for (let i = 0; i < videoFiles.length; i++) {
-                const file = videoFiles[i];
-                if (['video/mp4'].includes(file.type)) {
-                    videoUrls.push(URL.createObjectURL(file));
-                } else {
-                    alert(`File ${file.name} is not a valid MP4 video and will be skipped.`);
-                }
-            }
+    const eventId = name.toLowerCase().replace(/\s+/g, '-');
+    const reader = new FileReader();
 
-            const eventId = name.toLowerCase().replace(/\s+/g, '-');
-            const posterUrl = URL.createObjectURL(posterFile);
+    reader.onload = function (e) {
+        const posterBase64 = e.target.result;
 
-            events[eventId] = {
-                name,
-                organizer: department,
-                date,
-                time,
-                venue,
-                description,
-                googleFormLink,
-                poster: posterUrl,
-                pictures: pictureUrls,
-                videos: videoUrls,
-                participants: []
-            };
+        events[eventId] = {
+            name,
+            organizer: department,
+            date,
+            time,
+            venue,
+            description,
+            poster: posterBase64,
+            participants: []
+        };
 
-            saveEventsToLocalStorage();
-            renderEvents();
+        saveEventsToLocalStorage();
+        renderEvents();
+        document.getElementById('host-event-form').reset();
+        showMainPage();
+    };
 
-            document.getElementById('host-event-form').reset();
-            showMainPage();
-        }
+    reader.readAsDataURL(posterFile);  // converts to base64
+}
+
 
         function searchEvents() {
             const searchTerm = document.getElementById('search-input').value.toLowerCase();
