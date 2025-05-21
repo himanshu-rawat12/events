@@ -192,6 +192,45 @@
       }, function(error) {
         alert("Failed to send email: " + JSON.stringify(error));
       });
-  });
+
+  
+  
+  const formData = {
+      leader: {
+        name: document.getElementById('leader_name').value,
+        email: document.querySelector('[name="email"]').value,
+        roll: document.getElementById('leader_roll').value,
+        section: document.getElementById('leader_section').value,
+        year: document.getElementById('leader_year').value,
+        course: document.getElementById('leader_course').value,
+      },
+      member2: {
+        name: document.getElementById('member2_name').value,
+        roll: document.getElementById('member2_roll').value,
+        section: document.getElementById('member2_section').value,
+        year: document.getElementById('member2_year').value,
+        course: document.getElementById('member2_course').value,
+      },
+      member3: {
+        name: document.getElementById('member3_name').value,
+        roll: document.getElementById('member3_roll').value,
+        section: document.getElementById('member3_section').value,
+        year: document.getElementById('member3_year').value,
+        course: document.getElementById('member3_course').value,
+      },
+      member4: {
+        name: document.getElementById('member4_name').value,
+        roll: document.getElementById('member4_roll').value,
+        section: document.getElementById('member4_section').value,
+        year: document.getElementById('member4_year').value,
+        course: document.getElementById('member4_course').value,
+      }
+	  };
+	  localStorage.setItem('eventRegistration', JSON.stringify(formData));
+    alert("Registration submitted!");
+    window.close(); // Close tab after submission if needed
+    });
+	
+	
 </script>
 </html>
